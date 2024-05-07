@@ -42,8 +42,18 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    public function time()
+    public function times()
     {
         return $this->hasMany(Time::class);
+    }
+
+
+    public function scopeKeywordSearch($query, $keyword)
+    {
+        if (!empty($keyword)) {
+            $query->whereHas('times', function ($timeQuery) use ($keyword) {
+                $timeQuery->where('name', 'like', '%' . $keyword . '%');
+            });
+        }
     }
 }

@@ -19,6 +19,11 @@ use App\Http\Controllers\TimeController;
 //     return view('welcome');
 // });
 // Route::get('/', [AuthController::class, 'index']);
+
+
 Route::middleware('auth')->group(function () {
         Route::get('/', [TimeController::class, 'index']);
+        Route::post('/save', [TimeController::class, 'store']);
+        Route::get('/search', [TimeController::class, 'search']);
+        Route::post('/export', [TimeController::class, 'export']);
 });
