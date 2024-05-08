@@ -33,18 +33,32 @@ class TimeController extends Controller
                 'clock_in' => Carbon::now(), // 現在の時刻を出勤時刻として保存
             ]);
             break;
+
         case 'clock_out':
             $user = Auth::user();
+            // $latestTimeRecord = $user->times()->latest()->first();
+            // if ($latestTimeRecord && is_null($latestTimeRecord->clock_out)) {
+            //     $latestTimeRecord->update([
             $user->times()->create([
                 'clock_out' => Carbon::now(),
             ]);
+
             break;
+
         // case 'break_in':
-        //     // 休憩開始の処理
+        //     $user = Auth::user();
+        //     $user->times()->create([
+        //         'break_in' => Carbon::now(),
+        //     ]);
         //     break;
-        // case 'bleak_out':
-        //     // 休憩終了の処理
+
+        // case 'break_out':
+        //     $user = Auth::user();
+        //     $user->times()->create([
+        //         'break_out' => Carbon::now(),
+        //     ]);
         //     break;
+
         default:
             // その他の処理
             break;
@@ -62,7 +76,7 @@ class TimeController extends Controller
 
         $users = User::with(['times' => function ($query) {
         $query->select('user_id', 'clock_in', 'clock_out')->latest('clock_in'); // 出勤時間で最新のものを取得
-        }])->keywordSearch($request->keyword)->orderByDesc('created_at')->paginate(5);
+        }])->keywordSearch($request->keyword)->orderByDesc('created_at')->Paginate(5);
         // dd($users);
 
         return view('index',compact('users'));

@@ -23,13 +23,23 @@
             </form> --}}
             <form action="/save" method="post">
                 @csrf
-                <button type="submit" name="action" value="clock_in">出勤</button>
+                <button type="submit" name="action" value="clock_in">勤務開始</button>
             </form>
 
             <form action="/save" method="post">
                 @csrf
-                <button type="submit" name="action" value="clock_out">退勤</button>
+                <button type="submit" name="action" value="clock_out">勤務終了</button>
             </form>
+
+            {{-- <form action="/save" method="post">
+                @csrf
+                <button type="submit" name="action" value="break_in">休憩開始</button>
+            </form>
+
+            <form action="/save" method="post">
+                @csrf
+                <button type="submit" name="action" value="break_out">休憩終了</button>
+            </form> --}}
         </div>
         {{-- カレンダー表示 日付画面 --}}
         <input class="search-form__date" type="date" name="date" value="{{ request('date') }}">
@@ -54,22 +64,40 @@
                 <th class="search__label">お名前</th>
                 <th class="search__label">出勤時間</th>
                 <th class="search__label">退勤時間</th>
+                <th class="search__label">休憩時間</th>
+                <th clss="search__lavel">勤務時間</th>
                 {{-- ページネーション表示 --}}
-                {{-- {{ $users->links('vendor.pagination.simple-tailwind') }} --}}
+                {{-- {{ $users->links() }} --}}
             </tr>
             @foreach ($users as $user)
                 <tr>
                     <td class="search__data">{{ $user->name }}</td>
                     @if ($user->times->isNotEmpty())
-                            <td class="search__data">{{ $user->times->first()->clock_in }}</td>
-                            <td class="search__data">{{ $user->times->last()->clock_out }}</td>
+                            <td class="search__data">{{ \Carbon\Carbon::parse($user->times->first()->clock_in)->format('H:i:s') }}</td>
+                            <td class="search__data">{{ \Carbon\Carbon::parse($user->times->last()->clock_out)->format('H:i:s') }}</td>
+                            @php
+                            $clockIn = \Carbon\Carbon::parse($user->times->first()->clock_in);
+                            $clockOut = \Carbon\Carbon::parse($user->times->last()->clock_out);
+                            $diffInSeconds = $clockOut->diffInSeconds($clockIn);
+                            $hours = floor($diffInSeconds / 3600);
+                            // $hours = floor($diffInMinutes / 60);
+                            $minutes = floor(($diffInSeconds % 3600) / 60);
+                            // $minutes = $diffInMinutes % 60;
+                            $seconds = $diffInSeconds % 60;
+                            @endphp
+                            <td class="search__data">{{ $hours }} : {{ $minutes }} : {{ $seconds }} </td>
+                            {{-- <td class="search__data">{{ \Carbon\Carbon::parse($user->times->last()->clock_out)->diffInHours(\Carbon\Carbon::parse($user->times->first()->clock_in)) }} </td> --}}
+                            {{-- <td class="search__data">{{ $user->times->first()->clock_in }}</td>
+                            <td class="search__data">{{ $user->times->last()->clock_out }}</td> --}}
                     @else
                             <td class="search__data">-</td>
                             <td class="search__data">-</td>
+                            <td class="search__data">-</td>
+                            <td class="search__data">-</td>
                     @endif
-                            <td class="search__data">
+                            {{-- <td class="search__data">
                             <a class="search__detail-btn" href="#{{ $user->id }}">詳細</a>
-                            </td>
+                            </td> --}}
                 </tr>
 
                 {{-- <div class="modal" id="{{ $user->id }}">
